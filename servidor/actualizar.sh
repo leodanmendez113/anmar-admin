@@ -24,14 +24,18 @@ flock -n 9 || exit 0
 
 como_deploy() { runuser -u deploy -- "$@"; }
 TODO=${1:-}
+# Si un repositorio no existe o GitHub falla, git no debe quedarse esperando un usuario.
+export GIT_TERMINAL_PROMPT=0
 
 for repo in "${!SITIOS[@]}"; do
   sitio=${SITIOS[$repo]}
   dir=$RAIZ/repos/$repo
   marca=$RAIZ/estado/$repo.publicado
 
-  if [ ! -d "$dir/.git" ]; then
-    como_deploy git clone -q "$GITHUB/$repo.git" "$dir"
+  # Un repositorio que falta (o un error de red) no frena la publicación de los demás.
+  if [ ! -d "$dir/.git" ] && ! como_deploy git clone -q "$GITHUB/$repo.git" "$dir"; then
+    echo "[$repo] no se pudo clonar (¿existe en GitHub?); se reintenta en 2 minutos"
+    continue
   fi
   if ! como_deploy git -C "$dir" fetch -q origin main; then
     echo "[$repo] no se pudo consultar GitHub; se reintenta en 2 minutos"
