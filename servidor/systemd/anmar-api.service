@@ -10,6 +10,9 @@ Environment=PUERTO=3100
 Environment=DATOS_DIR=/srv/anmar/datos
 Environment=CREDENCIALES=/srv/anmar/config/credenciales.json
 Environment=ORIGEN=https://admin.anmarproductions.com
+Environment=TURNSTILE_HOST=admin.anmarproductions.com
+# Clave secreta de Cloudflare Turnstile (TURNSTILE_SECRET=...). Solo root puede leer el archivo.
+EnvironmentFile=-/etc/anmar/api.env
 ExecStart=/usr/bin/node /srv/anmar/api/servidor.js
 Restart=always
 RestartSec=3

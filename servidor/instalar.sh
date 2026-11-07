@@ -72,6 +72,9 @@ install -d -m 0755 -o deploy -g deploy $RAIZ/repos $RAIZ/sitios
 install -d -m 0755 -o deploy -g deploy $RAIZ/sitios/portafolio $RAIZ/sitios/eventos $RAIZ/sitios/comercial $RAIZ/sitios/admin
 install -d -m 0755 -o anmar  -g anmar  $RAIZ/datos
 install -d -m 0700 -o anmar  -g anmar  $RAIZ/config
+# Secretos de la API (ej. TURNSTILE_SECRET=...) en /etc/anmar/api.env: solo root, nunca en git.
+install -d -m 0700 -o root -g root /etc/anmar
+[ -f /etc/anmar/api.env ] || install -m 0600 -o root -g root /dev/null /etc/anmar/api.env
 chown -R deploy:deploy $RAIZ/repos
 
 paso "Datos iniciales (solo si todavía no existen)"
