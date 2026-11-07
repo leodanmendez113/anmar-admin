@@ -12,14 +12,15 @@ const CAMPOS = [
 const MENSAJES = [
   { id: 'portafolio', etiqueta: 'Mensaje desde el portafolio' },
   { id: 'eventos', etiqueta: 'Primera línea desde eventos', ayuda: 'Debajo se agregan solos el servicio, las horas, las fotos y el total.' },
-  { id: 'comercial', etiqueta: 'Mensaje desde comercial', ayuda: 'Los botones de cada paquete agregan solos el nombre y el precio.' }
+  { id: 'comercial', etiqueta: 'Mensaje desde comercial', ayuda: 'Los botones de cada paquete agregan solos el nombre y el precio.' },
+  { id: 'bodas', etiqueta: 'Mensaje desde bodas (opcional)', ayuda: 'Vacío = "Hi Ángel! We would love to check your availability for our wedding."' }
 ]
 
 export function crearContacto(contenedor, datos, alCambiar) {
   const estado = structuredClone(datos)
 
   contenedor.innerHTML = `
-    <p class="ayuda">Estos datos se usan en las 3 webs. Se ven apenas tocas "Guardar".</p>
+    <p class="ayuda">Estos datos se usan en todas las webs. Se ven apenas tocas "Guardar".</p>
     <section class="panel contacto">
       ${CAMPOS.map((c) => `
         <label for="c-${c.id}">${c.etiqueta}</label>
@@ -31,7 +32,7 @@ export function crearContacto(contenedor, datos, alCambiar) {
       <h2>Mensajes de WhatsApp</h2>
       ${MENSAJES.map((m) => `
         <label for="m-${m.id}">${m.etiqueta}</label>
-        <textarea id="m-${m.id}" rows="3" maxlength="300" data-mensaje="${m.id}">${escapar(estado.mensajes[m.id])}</textarea>
+        <textarea id="m-${m.id}" rows="3" maxlength="300" data-mensaje="${m.id}">${escapar(estado.mensajes[m.id] ?? '')}</textarea>
         ${m.ayuda ? `<small>${m.ayuda}</small>` : ''}`).join('')}
       <a class="boton secundario" data-probar target="_blank" rel="noopener">Probar WhatsApp →</a>
     </section>`

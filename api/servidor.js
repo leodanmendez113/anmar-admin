@@ -1,7 +1,7 @@
 import { createServer } from 'node:http'
 import { CONFIG } from './config.js'
 import { VALIDADORES } from './validar.js'
-import { leer, guardar } from './archivos.js'
+import { leer, guardar, guardarFoto, borrarFoto } from './archivos.js'
 import {
   bloqueada, anotarFallo, iniciarSesion, sesionValida, cerrarSesion, cookieSesion, tokenDeCookie
 } from './sesiones.js'
@@ -15,21 +15,27 @@ import { verificarTurnstile } from './turnstile.js'
 //   GET  /api/sesion
 //   GET  /api/datos/:nombre    nombre = videos | precios-eventos | precios-comercial | contacto
 //   PUT  /api/datos/:nombre
+//   POST   /api/media/bodas            { datos, chica: <fotos en base64, JPEG o WebP> } → { archivo }
+//   DELETE /api/media/bodas/:archivo
 
 const LIMITE_CUERPO = 200 * 1024
+const LIMITE_FOTO = 3 * 1024 * 1024
+const LIMITE_CHICA = 600 * 1024
+// En base64 las fotos ocupan ~4/3 de su tamaño.
+const LIMITE_CUERPO_FOTO = Math.ceil((LIMITE_FOTO + LIMITE_CHICA) * 4 / 3) + 1024
 
 function responder(res, estado, cuerpo, extra = {}) {
   res.writeHead(estado, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', ...extra })
   res.end(JSON.stringify(cuerpo))
 }
 
-function leerCuerpo(req) {
+function leerCuerpo(req, limite = LIMITE_CUERPO) {
   return new Promise((resolver, rechazar) => {
     let total = 0
     const partes = []
     req.on('data', (p) => {
       total += p.length
-      if (total > LIMITE_CUERPO) { rechazar(new Error('grande')); req.destroy() } else partes.push(p)
+      if (total > limite) { rechazar(new Error('grande')); req.destroy() } else partes.push(p)
     })
     req.on('end', () => {
       try { resolver(JSON.parse(Buffer.concat(partes).toString('utf8') || '{}')) } catch { rechazar(new Error('json')) }
@@ -50,7 +56,8 @@ export function crearServidor() {
     const metodo = req.method
     try {
       if (metodo !== 'GET' && !origenValido(req)) return responder(res, 403, { error: 'Origen no permitido.' })
-      if (metodo !== 'GET' && !String(req.headers['content-type']).startsWith('application/json') && url.pathname !== '/api/logout') {
+      const sinCuerpo = url.pathname === '/api/logout' || metodo === 'DELETE'
+      if (metodo !== 'GET' && !sinCuerpo && !String(req.headers['content-type']).startsWith('application/json')) {
         return responder(res, 415, { error: 'Se esperaba JSON.' })
       }
 
@@ -88,6 +95,25 @@ export function crearServidor() {
           const r = VALIDADORES[m[1]](await leerCuerpo(req))
           if (!r.ok) return responder(res, 400, { error: r.error })
           await guardar(m[1], r.datos)
+          return responder(res, 200, { ok: true })
+        }
+      }
+      const media = url.pathname.match(/^\/api\/media\/bodas(?:\/([^/]+))?$/)
+      if (media) {
+        if (!sesion) return responder(res, 401, { error: 'Tu sesión venció. Vuelve a entrar.' })
+        if (metodo === 'POST' && !media[1]) {
+          const { datos, chica } = await leerCuerpo(req, LIMITE_CUERPO_FOTO)
+          const grande = Buffer.from(String(datos ?? ''), 'base64')
+          const peque = Buffer.from(String(chica ?? ''), 'base64')
+          if (!grande.length || grande.length > LIMITE_FOTO || !peque.length || peque.length > LIMITE_CHICA) {
+            return responder(res, 413, { error: 'La foto es demasiado grande (máx. 3 MB).' })
+          }
+          const archivo = await guardarFoto('bodas', grande, peque)
+          if (!archivo) return responder(res, 415, { error: 'Ese archivo no es una foto JPEG o WebP.' })
+          return responder(res, 200, { archivo })
+        }
+        if (metodo === 'DELETE' && media[1]) {
+          if (!(await borrarFoto('bodas', media[1]))) return responder(res, 400, { error: 'Nombre de foto inválido.' })
           return responder(res, 200, { ok: true })
         }
       }

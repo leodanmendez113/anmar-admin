@@ -85,12 +85,58 @@ function contacto(d) {
     if (!texto(m, 300) || !m) return falla(`El mensaje de WhatsApp de ${sitio} es obligatorio (máx. 300 caracteres).`)
     mensajes[sitio] = m
   }
+  // Bodas es opcional: si queda vacío, la web usa su mensaje por defecto.
+  const bodas = limpio(d.mensajes.bodas) ?? ''
+  if (!texto(bodas, 300)) return falla('El mensaje de WhatsApp de bodas es demasiado largo (máx. 300).')
+  if (bodas) mensajes.bodas = bodas
   return { ok: true, datos: { whatsapp, email, instagram, tiktok, youtube, mensajes } }
+}
+
+const ID_VIDEO = { vimeo: /^\d{6,12}$/, youtube: /^[\w-]{11}$/ }
+const MINIATURA = /^https:\/\/(i\.vimeocdn\.com|i\.ytimg\.com)\/\S{1,280}$/
+const FOTO = /^[a-f0-9]{24}\.(webp|jpg)$/
+
+function bodas(d) {
+  if (!d || !Array.isArray(d.peliculas) || !Array.isArray(d.fotos) || typeof d.portada !== 'string') return falla('Formato de bodas inválido.')
+  if (d.peliculas.length > 60) return falla('Máximo 60 películas.')
+  if (d.fotos.length > 300) return falla('Máximo 300 fotos.')
+
+  const ids = new Set()
+  for (const p of d.peliculas) {
+    if (!ID_VIDEO[p?.plataforma]?.test(p.id)) return falla('Hay una película con un link de Vimeo o YouTube inválido.')
+    if (ids.has(p.plataforma + p.id)) return falla('Hay una película repetida.')
+    ids.add(p.plataforma + p.id)
+    if (!texto(p.pareja, 60) || !texto(p.lugar, 60)) return falla('Nombre de la pareja o lugar demasiado largo (máx. 60).')
+    if (p.miniatura !== '' && !MINIATURA.test(p.miniatura)) return falla('Miniatura de película inválida.')
+    if (typeof p.destacada !== 'boolean' || typeof p.oculto !== 'boolean') return falla('Valores de película inválidos.')
+  }
+  if (d.peliculas.filter((p) => p.destacada).length > 1) return falla('Solo puede haber una película destacada.')
+
+  const archivos = new Set()
+  for (const f of d.fotos) {
+    if (!FOTO.test(f?.archivo)) return falla('Hay una foto con un nombre de archivo inválido.')
+    if (archivos.has(f.archivo)) return falla('Hay una foto repetida.')
+    archivos.add(f.archivo)
+    if (!entero(f.ancho, 1, 10000) || !entero(f.alto, 1, 10000)) return falla('Medidas de foto inválidas.')
+    if (typeof f.oculto !== 'boolean') return falla('Valor "oculto" de foto inválido.')
+  }
+  if (d.portada && !archivos.has(d.portada)) return falla('La foto de portada no está en la lista de fotos.')
+
+  return {
+    ok: true,
+    datos: {
+      portada: d.portada,
+      peliculas: d.peliculas.map(({ plataforma, id, pareja, lugar, miniatura, destacada, oculto }) =>
+        ({ plataforma, id, pareja: pareja.trim(), lugar: lugar.trim(), miniatura, destacada, oculto })),
+      fotos: d.fotos.map(({ archivo, ancho, alto, oculto }) => ({ archivo, ancho, alto, oculto }))
+    }
+  }
 }
 
 export const VALIDADORES = {
   videos,
   'precios-eventos': preciosEventos,
   'precios-comercial': preciosComercial,
-  contacto
+  contacto,
+  bodas
 }

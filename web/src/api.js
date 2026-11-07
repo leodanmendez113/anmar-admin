@@ -19,7 +19,9 @@ export const api = {
   entrar: (usuario, clave, turnstile) => pedir('/login', { method: 'POST', body: JSON.stringify({ usuario, clave, turnstile }) }),
   salir: () => pedir('/logout', { method: 'POST' }),
   leer: (nombre) => pedir(`/datos/${nombre}`),
-  guardar: (nombre, datos) => pedir(`/datos/${nombre}`, { method: 'PUT', body: JSON.stringify(datos) })
+  guardar: (nombre, datos) => pedir(`/datos/${nombre}`, { method: 'PUT', body: JSON.stringify(datos) }),
+  subirFoto: (base64, chica) => pedir('/media/bodas', { method: 'POST', body: JSON.stringify({ datos: base64, chica }) }),
+  borrarFoto: (archivo) => pedir(`/media/bodas/${encodeURIComponent(archivo)}`, { method: 'DELETE' })
 }
 
 export const escapar = (s) =>

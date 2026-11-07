@@ -69,8 +69,8 @@ id anmar  >/dev/null 2>&1 || useradd --system --no-create-home --shell /usr/sbin
 id deploy >/dev/null 2>&1 || useradd --system --create-home --home-dir /home/deploy --shell /usr/sbin/nologin deploy
 install -d -m 0755 -o root   -g root   $RAIZ $RAIZ/api $RAIZ/estado
 install -d -m 0755 -o deploy -g deploy $RAIZ/repos $RAIZ/sitios
-install -d -m 0755 -o deploy -g deploy $RAIZ/sitios/portafolio $RAIZ/sitios/eventos $RAIZ/sitios/comercial $RAIZ/sitios/admin
-install -d -m 0755 -o anmar  -g anmar  $RAIZ/datos
+install -d -m 0755 -o deploy -g deploy $RAIZ/sitios/portafolio $RAIZ/sitios/eventos $RAIZ/sitios/comercial $RAIZ/sitios/bodas $RAIZ/sitios/admin
+install -d -m 0755 -o anmar  -g anmar  $RAIZ/datos $RAIZ/media $RAIZ/media/bodas
 install -d -m 0700 -o anmar  -g anmar  $RAIZ/config
 # Secretos de la API (ej. TURNSTILE_SECRET=...) en /etc/anmar/api.env: solo root, nunca en git.
 install -d -m 0700 -o root -g root /etc/anmar
@@ -78,7 +78,7 @@ install -d -m 0700 -o root -g root /etc/anmar
 chown -R deploy:deploy $RAIZ/repos
 
 paso "Datos iniciales (solo si todavía no existen)"
-for f in videos precios-eventos precios-comercial contacto; do
+for f in videos precios-eventos precios-comercial contacto bodas; do
   if [ ! -f $RAIZ/datos/$f.json ]; then
     install -m 0644 -o anmar -g anmar "$AQUI/datos-iniciales/$f.json" $RAIZ/datos/$f.json
   fi
@@ -100,5 +100,5 @@ systemctl enable -q --now anmar-api anmar-actualizar.timer
 systemctl reload caddy || systemctl restart caddy
 
 paso "Listo"
-echo "Webs:  https://portafolio. / eventos. / comercial. / admin.anmarproductions.com"
+echo "Webs:  https://portafolio. / eventos. / comercial. / bodas. / admin.anmarproductions.com"
 [ -f $RAIZ/config/credenciales.json ] || echo "FALTA: corre 'anmar-clave' (solo, en su propia línea) para crear el usuario y la contraseña del admin."

@@ -14,6 +14,7 @@ declare -A SITIOS=(
   [angel-portafolio]=portafolio
   [angel-cotizador]=eventos
   [anmar-comercial]=comercial
+  [anmar-bodas]=bodas
   [anmar-admin]=admin
 )
 

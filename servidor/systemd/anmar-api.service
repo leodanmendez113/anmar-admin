@@ -8,6 +8,7 @@ Group=anmar
 Environment=NODE_ENV=production
 Environment=PUERTO=3100
 Environment=DATOS_DIR=/srv/anmar/datos
+Environment=MEDIA_DIR=/srv/anmar/media
 Environment=CREDENCIALES=/srv/anmar/config/credenciales.json
 Environment=ORIGEN=https://admin.anmarproductions.com
 Environment=TURNSTILE_HOST=admin.anmarproductions.com
@@ -17,12 +18,12 @@ ExecStart=/usr/bin/node /srv/anmar/api/servidor.js
 Restart=always
 RestartSec=3
 
-# Endurecimiento: la API solo puede escribir en datos/ y config/.
+# Endurecimiento: la API solo puede escribir en datos/, media/ y config/.
 NoNewPrivileges=true
 ProtectSystem=strict
 ProtectHome=true
 PrivateTmp=true
-ReadWritePaths=/srv/anmar/datos /srv/anmar/config
+ReadWritePaths=/srv/anmar/datos /srv/anmar/media /srv/anmar/config
 
 [Install]
 WantedBy=multi-user.target

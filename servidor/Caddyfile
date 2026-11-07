@@ -19,6 +19,12 @@
 		root * /srv/anmar/datos
 		file_server
 	}
+	# Fotos subidas desde el admin: nombre aleatorio y único, así que se guardan un año en caché.
+	handle_path /media/* {
+		header Cache-Control "public, max-age=31536000, immutable"
+		root * /srv/anmar/media
+		file_server
+	}
 }
 
 (estatico) {
@@ -51,6 +57,14 @@ comercial.anmarproductions.com {
 	import comun
 	handle {
 		root * /srv/anmar/sitios/comercial
+		import estatico
+	}
+}
+
+bodas.anmarproductions.com {
+	import comun
+	handle {
+		root * /srv/anmar/sitios/bodas
 		import estatico
 	}
 }

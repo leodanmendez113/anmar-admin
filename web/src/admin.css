@@ -121,3 +121,20 @@ input[type="tel"], input[type="email"] {
   border: 1px solid var(--borde); background: var(--fondo); color: var(--texto); font: inherit; font-size: 16px;
 }
 input[type="tel"]:focus, input[type="email"]:focus { outline: none; border-color: var(--acento); }
+
+/* ---------- Bodas ---------- */
+.sub { font-size: 1.3rem; margin: 22px 0 10px; }
+.peliculas li { grid-template-columns: 0 110px minmax(0, 1fr); }
+.peliculas img.horizontal { width: 110px; aspect-ratio: 16 / 9; }
+.plataforma { color: var(--texto-suave); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; }
+.subir { position: relative; cursor: pointer; text-transform: none; letter-spacing: 0; font-size: 1rem; margin: 0 0 10px; }
+.grilla-fotos { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+.grilla-fotos li { position: relative; border-radius: 14px; overflow: hidden; background: var(--tarjeta); border: 2px solid transparent; }
+.grilla-fotos li.es-portada { border-color: var(--acento); }
+.grilla-fotos li.oculto img { opacity: 0.35; }
+.grilla-fotos img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; display: block; }
+.foto-acciones { display: flex; justify-content: space-between; gap: 2px; padding: 6px; background: var(--fondo-2); }
+.foto-acciones button { flex: 1; min-height: 36px; border: 0; border-radius: 8px; background: var(--tarjeta); font-size: 0.9rem; }
+.es-portada .foto-acciones [data-accion='portada'] { color: var(--acento); }
+.foto-acciones .peligro { color: #FF7A6B; }
+@media (min-width: 720px) { .grilla-fotos { grid-template-columns: repeat(3, 1fr); } }

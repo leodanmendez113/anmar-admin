@@ -26,6 +26,7 @@ process.env.DATOS_DIR = tmp
 process.env.CREDENCIALES = join(tmp, 'cred.json')
 process.env.ORIGEN = 'http://prueba.local'
 process.env.TURNSTILE_SECRET = 'secreto-prueba'
+process.env.MEDIA_DIR = join(tmp, 'media')
 process.env.TURNSTILE_URL = `http://127.0.0.1:${cloudflare.address().port}/siteverify`
 process.env.TURNSTILE_HOST = 'prueba.local'
 
@@ -134,6 +135,45 @@ test('contacto: guarda datos válidos (limpia @ y espacios) y rechaza inválidos
   }
   const sinMensaje = await pedir('/api/datos/contacto', { metodo: 'PUT', cuerpo: { ...bueno, mensajes: { ...bueno.mensajes, eventos: ' ' } } })
   assert.equal(sinMensaje.status, 400)
+})
+
+test('fotos de bodas: sube JPEG/WebP, rechaza lo que no es imagen y borra', async () => {
+  const jpeg = Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xe0]), Buffer.alloc(200, 1)])
+  const webp = Buffer.concat([Buffer.from('RIFF'), Buffer.alloc(4), Buffer.from('WEBP'), Buffer.alloc(100, 2)])
+  const subir = (buf, opciones = {}) => pedir('/api/media/bodas', { metodo: 'POST', cuerpo: { datos: buf.toString('base64'), chica: buf.toString('base64') }, ...opciones })
+
+  assert.equal((await subir(jpeg, { conCookie: false })).status, 401)
+  assert.equal((await subir(Buffer.from('<?php echo 1; ?>'))).status, 415)
+  const r1 = await subir(jpeg)
+  assert.equal(r1.status, 200)
+  const { archivo } = await r1.json()
+  assert.match(archivo, /^[a-f0-9]{24}\.jpg$/)
+  assert.ok(readdirSync(join(tmp, 'media', 'bodas')).includes(archivo))
+  assert.ok(readdirSync(join(tmp, 'media', 'bodas')).includes(archivo.replace('.jpg', '-m.jpg')))
+  assert.match((await (await subir(webp)).json()).archivo, /\.webp$/)
+  const mezcla = await pedir('/api/media/bodas', { metodo: 'POST', cuerpo: { datos: jpeg.toString('base64'), chica: Buffer.from('nada').toString('base64') } })
+  assert.equal(mezcla.status, 415)
+
+  assert.equal((await pedir('/api/media/bodas/../../cred.json', { metodo: 'DELETE' })).status, 404)
+  assert.equal((await pedir('/api/media/bodas/no-valido.jpg', { metodo: 'DELETE' })).status, 400)
+  assert.equal((await pedir(`/api/media/bodas/${archivo}`, { metodo: 'DELETE' })).status, 200)
+  assert.ok(!readdirSync(join(tmp, 'media', 'bodas')).includes(archivo))
+  assert.ok(!readdirSync(join(tmp, 'media', 'bodas')).includes(archivo.replace('.jpg', '-m.jpg')))
+})
+
+test('bodas: valida películas, fotos y portada', async () => {
+  const base = await (await pedir('/api/datos/bodas')).json()
+  const foto = { archivo: 'a'.repeat(24) + '.webp', ancho: 2000, alto: 1333, oculto: false }
+  const bueno = { ...base, portada: foto.archivo, fotos: [foto] }
+  assert.equal((await pedir('/api/datos/bodas', { metodo: 'PUT', cuerpo: bueno })).status, 200)
+
+  const dosDestacadas = { ...bueno, peliculas: [...bueno.peliculas, { ...bueno.peliculas[0], plataforma: 'youtube', id: 'dQw4w9WgXcQ' }] }
+  assert.equal((await pedir('/api/datos/bodas', { metodo: 'PUT', cuerpo: dosDestacadas })).status, 400)
+  assert.equal((await pedir('/api/datos/bodas', { metodo: 'PUT', cuerpo: { ...bueno, portada: 'b'.repeat(24) + '.webp' } })).status, 400)
+  const malId = { ...bueno, peliculas: [{ ...bueno.peliculas[0], id: 'abc' }] }
+  assert.equal((await pedir('/api/datos/bodas', { metodo: 'PUT', cuerpo: malId })).status, 400)
+  const malaMini = { ...bueno, peliculas: [{ ...bueno.peliculas[0], miniatura: 'https://malo.com/x.jpg' }] }
+  assert.equal((await pedir('/api/datos/bodas', { metodo: 'PUT', cuerpo: malaMini })).status, 400)
 })
 
 test('cerrar sesión invalida la cookie', async () => {

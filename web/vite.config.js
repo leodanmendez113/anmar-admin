@@ -1,5 +1,19 @@
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import { createReadStream, existsSync } from 'node:fs'
+import { join } from 'node:path'
+
+// Solo en desarrollo: sirve /media/* desde admin/servidor/media-dev (en el VPS lo hace Caddy).
+const mediaLocal = {
+  name: 'media-local',
+  configureServer(server) {
+    server.middlewares.use('/media', (req, res, next) => {
+      const archivo = join(import.meta.dirname, '../servidor/media-dev', decodeURIComponent(req.url.split('?')[0]))
+      if (!archivo.startsWith(join(import.meta.dirname, '../servidor/media-dev')) || !existsSync(archivo)) return next()
+      createReadStream(archivo).pipe(res)
+    })
+  }
+}
 
 export default defineConfig({
   base: '/',
@@ -9,6 +23,7 @@ export default defineConfig({
     proxy: { '/api': 'http://127.0.0.1:3100' }
   },
   plugins: [
+    mediaLocal,
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon-180x180.png', 'logo.svg'],
@@ -29,7 +44,7 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,ico}'],
         // La API nunca se guarda en caché: siempre datos frescos.
-        navigateFallbackDenylist: [/^\/api/]
+        navigateFallbackDenylist: [/^\/api/, /^\/media/]
       }
     })
   ]

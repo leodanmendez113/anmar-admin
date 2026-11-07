@@ -5,6 +5,7 @@ import { crearVideos } from './videos.js'
 import { crearEventos } from './eventos.js'
 import { crearComercial } from './comercial.js'
 import { crearContacto } from './contacto.js'
+import { crearBodas } from './bodas.js'
 import { TURNSTILE_SITE_KEY } from './config.js'
 
 const $ = (sel) => document.querySelector(sel)
@@ -44,6 +45,7 @@ const SECCIONES = {
   videos: { titulo: 'Videos', archivo: 'videos', crear: crearVideos },
   eventos: { titulo: 'Precios eventos', archivo: 'precios-eventos', crear: crearEventos },
   comercial: { titulo: 'Precios comercial', archivo: 'precios-comercial', crear: crearComercial },
+  bodas: { titulo: 'Bodas', archivo: 'bodas', crear: crearBodas },
   contacto: { titulo: 'Contacto', archivo: 'contacto', crear: crearContacto }
 }
 
@@ -101,6 +103,7 @@ $('[data-guardar]').addEventListener('click', async () => {
     const datos = actual.editor.datos()
     await api.guardar(SECCIONES[actual.clave].archivo, datos)
     actual.original = JSON.stringify(datos)
+    await actual.editor.despuesDeGuardar?.()
     marcarCambios()
     $('[data-estado]').textContent = '✓ Guardado. Ya se ve en la web.'
   } catch (e) {
