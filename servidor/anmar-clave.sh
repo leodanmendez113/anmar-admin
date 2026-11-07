@@ -12,7 +12,7 @@ if [ ! -t 0 ]; then
 fi
 
 read -rp "Usuario del admin (ej: angel): " usuario
-read -rsp "Contraseña nueva (mínimo 10 caracteres): " clave; echo
+read -rsp "Contraseña nueva (mínimo 8 caracteres): " clave; echo
 read -rsp "Repite la contraseña: " repetida; echo
 
 if [ "$clave" != "$repetida" ]; then

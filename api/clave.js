@@ -17,7 +17,7 @@ try {
 const [usuario = '', clave = ''] = entrada.replace(/\r/g, '').split('\n')
 
 if (!/^[\w.-]{3,30}$/.test(usuario.trim())) salir('Usuario inválido: usa letras, números, punto o guion (3 a 30). No se guardó nada.')
-if (clave.length < 10) salir('La contraseña es muy corta (mínimo 10 caracteres). No se guardó nada.')
+if (clave.length < 8) salir('La contraseña es muy corta (mínimo 8 caracteres). No se guardó nada.')
 
 writeFileSync(CONFIG.credenciales, JSON.stringify({ usuario: usuario.trim(), hash: cifrarClave(clave) }, null, 2) + '\n')
 chmodSync(CONFIG.credenciales, 0o600)
