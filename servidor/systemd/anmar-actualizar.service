@@ -1,0 +1,9 @@
+[Unit]
+Description=Anmar: revisa GitHub y publica las webs que cambiaron
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/anmar-actualizar
+Nice=10

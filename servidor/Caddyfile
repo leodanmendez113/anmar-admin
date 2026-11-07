@@ -1,0 +1,69 @@
+# Caddy: servidor web de Anmar en el VPS. Consigue y renueva el HTTPS solo.
+# Se instala en /etc/caddy/Caddyfile con servidor/instalar.sh.
+# Después de cambiarlo: volver a correr instalar.sh (o `systemctl reload caddy`).
+
+(comun) {
+	encode zstd gzip
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		X-Frame-Options "SAMEORIGIN"
+		-Server
+	}
+	# Datos que maneja el admin (videos y precios). Siempre frescos; el historial no se publica.
+	handle_path /datos/* {
+		@historial path /historial/* *.tmp
+		respond @historial 404
+		header Cache-Control "no-cache"
+		root * /srv/anmar/datos
+		file_server
+	}
+}
+
+(estatico) {
+	# Los archivos de /assets/ llevan una huella en el nombre: se pueden guardar un año.
+	@huella path /assets/*
+	header @huella Cache-Control "public, max-age=31536000, immutable"
+	@siempre_fresco path / /index.html /sw.js /registerSW.js /manifest.webmanifest
+	header @siempre_fresco Cache-Control "no-cache"
+	try_files {path} /index.html
+	file_server
+}
+
+portafolio.anmarproductions.com {
+	import comun
+	handle {
+		root * /srv/anmar/sitios/portafolio
+		import estatico
+	}
+}
+
+eventos.anmarproductions.com {
+	import comun
+	handle {
+		root * /srv/anmar/sitios/eventos
+		import estatico
+	}
+}
+
+comercial.anmarproductions.com {
+	import comun
+	handle {
+		root * /srv/anmar/sitios/comercial
+		import estatico
+	}
+}
+
+admin.anmarproductions.com {
+	import comun
+	header X-Robots-Tag "noindex, nofollow"
+	# La API solo escucha en el propio servidor; desde afuera se entra únicamente por aquí.
+	handle /api/* {
+		reverse_proxy 127.0.0.1:3100
+	}
+	handle {
+		root * /srv/anmar/sitios/admin
+		import estatico
+	}
+}

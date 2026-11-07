@@ -1,0 +1,56 @@
+:root {
+  --fondo: #0C0C0E;
+  --fondo-2: #141417;
+  --tarjeta: #1A1A1E;
+  --texto: #F4F1EC;
+  --texto-suave: #9C978F;
+  --acento: #F2A93B;
+  --acento-oscuro: #D88E1E;
+  --borde: #2A2A30;
+  --serif: 'Fraunces', Georgia, serif;
+  --sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --radio: 18px;
+  --gutter: clamp(16px, 5vw, 48px);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; }
+[hidden] { display: none !important; }
+
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+html.sin-scroll { overflow: hidden; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  background: var(--fondo);
+  color: var(--texto);
+  font: 400 16px/1.6 var(--sans);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+h1, h2, h3 { font-family: var(--serif); font-weight: 400; line-height: 1.02; letter-spacing: -0.03em; }
+h2 { font-size: clamp(2.2rem, 9vw, 3.6rem); }
+em { font-style: italic; color: var(--acento); }
+img { max-width: 100%; display: block; }
+a { color: inherit; }
+button { font: inherit; color: inherit; cursor: pointer; }
+
+:focus-visible { outline: 2px solid var(--acento); outline-offset: 3px; border-radius: 8px; }
+
+.ceja {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 0.75rem; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--texto-suave); margin-bottom: 14px; font-weight: 500;
+}
+
+.boton {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 52px; padding: 0 26px; border-radius: 999px;
+  background: var(--acento); color: #17120A; text-decoration: none; font-weight: 600;
+  transition: transform 0.2s ease, background 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.boton:hover { background: var(--acento-oscuro); }
+.boton:active { transform: scale(0.97); }

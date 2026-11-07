@@ -1,0 +1,13 @@
+{
+  "name": "anmar-api",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "API del admin de Anmar: login y guardado de videos y precios en archivos JSON. Sin dependencias.",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "start": "node servidor.js",
+    "test": "node --test",
+    "clave": "node clave.js"
+  }
+}

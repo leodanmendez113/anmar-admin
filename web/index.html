@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Admin · Anmar Productions</title>
+  <meta name="theme-color" content="#0C0C0E" />
+  <link rel="icon" href="/logo.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+</head>
+<body class="admin">
+  <p class="cargando" data-cargando>Cargando…</p>
+
+  <section class="panel acceso" data-acceso hidden>
+    <p class="ceja">Anmar Productions</p>
+    <h1>Admin</h1>
+    <form data-form-login>
+      <label for="usuario">Usuario</label>
+      <input id="usuario" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" required />
+      <label for="clave">Contraseña</label>
+      <input id="clave" type="password" autocomplete="current-password" required />
+      <button class="boton" type="submit">Entrar</button>
+      <p class="error" data-error-login role="alert"></p>
+    </form>
+  </section>
+
+  <div class="app" data-app hidden>
+    <header class="ed-top">
+      <div>
+        <p class="ceja">Admin</p>
+        <h1 data-titulo>Videos</h1>
+      </div>
+      <button class="link" type="button" data-salir>Salir</button>
+    </header>
+
+    <nav class="pestanas" role="tablist" aria-label="Secciones">
+      <button type="button" role="tab" data-pestana="videos">Videos</button>
+      <button type="button" role="tab" data-pestana="eventos">Precios eventos</button>
+      <button type="button" role="tab" data-pestana="comercial">Precios comercial</button>
+    </nav>
+
+    <main data-contenido></main>
+
+    <div class="publicar" data-barra>
+      <p data-estado>Sin cambios</p>
+      <button class="boton" type="button" data-guardar disabled>Guardar</button>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

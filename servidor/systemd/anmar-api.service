@@ -1,0 +1,25 @@
+[Unit]
+Description=Anmar API (admin: videos y precios)
+After=network.target
+
+[Service]
+User=anmar
+Group=anmar
+Environment=NODE_ENV=production
+Environment=PUERTO=3100
+Environment=DATOS_DIR=/srv/anmar/datos
+Environment=CREDENCIALES=/srv/anmar/config/credenciales.json
+Environment=ORIGEN=https://admin.anmarproductions.com
+ExecStart=/usr/bin/node /srv/anmar/api/servidor.js
+Restart=always
+RestartSec=3
+
+# Endurecimiento: la API solo puede escribir en datos/ y config/.
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/srv/anmar/datos /srv/anmar/config
+
+[Install]
+WantedBy=multi-user.target

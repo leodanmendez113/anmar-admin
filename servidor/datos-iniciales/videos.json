@@ -1,0 +1,19 @@
+{
+  "categorias": [
+    "Comerciales",
+    "Producto",
+    "Redes sociales"
+  ],
+  "videos": [
+    { "id": "2_7LGCoRE98", "titulo": "Muestra 1", "categoria": "Comerciales", "formato": "vertical", "oculto": false },
+    { "id": "gv9PWusTOJw", "titulo": "Muestra 2", "categoria": "Producto", "formato": "vertical", "oculto": false },
+    { "id": "8Y05tdhS4Qw", "titulo": "Muestra 3", "categoria": "Redes sociales", "formato": "vertical", "oculto": false },
+    { "id": "O9LAUAYnZ8I", "titulo": "Muestra 4", "categoria": "Comerciales", "formato": "vertical", "oculto": false },
+    { "id": "U-YR_h_Jnoc", "titulo": "Muestra 5", "categoria": "Producto", "formato": "vertical", "oculto": false },
+    { "id": "NMRT32IqGM0", "titulo": "Muestra 6", "categoria": "Redes sociales", "formato": "vertical", "oculto": false },
+    { "id": "D-qb74oJZYY", "titulo": "Muestra 7", "categoria": "Comerciales", "formato": "vertical", "oculto": false },
+    { "id": "Ua-3TuhS4xg", "titulo": "Muestra 8", "categoria": "Producto", "formato": "vertical", "oculto": false },
+    { "id": "SLzOnoexu00", "titulo": "Muestra 9", "categoria": "Redes sociales", "formato": "vertical", "oculto": false },
+    { "id": "PSo2A5K_iCA", "titulo": "Muestra 10", "categoria": "Comerciales", "formato": "vertical", "oculto": false }
+  ]
+}

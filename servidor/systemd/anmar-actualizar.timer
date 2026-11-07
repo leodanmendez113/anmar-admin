@@ -1,0 +1,10 @@
+[Unit]
+Description=Anmar: revisar GitHub cada 2 minutos
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=2min
+Unit=anmar-actualizar.service
+
+[Install]
+WantedBy=timers.target
