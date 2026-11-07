@@ -64,8 +64,33 @@ function preciosComercial(d) {
   }
 }
 
+function contacto(d) {
+  if (!d || typeof d !== 'object' || !d.mensajes || typeof d.mensajes !== 'object') return falla('Formato de contacto inválido.')
+  const limpio = (v) => (typeof v === 'string' ? v.trim() : v)
+  const whatsapp = String(limpio(d.whatsapp) ?? '').replace(/[\s()+-]/g, '')
+  const email = limpio(d.email) ?? ''
+  const instagram = String(limpio(d.instagram) ?? '').replace(/^@/, '')
+  const tiktok = String(limpio(d.tiktok) ?? '').replace(/^@/, '')
+  const youtube = limpio(d.youtube) ?? ''
+
+  if (!/^\d{8,15}$/.test(whatsapp)) return falla('El WhatsApp tiene que ser el número con código de país, solo dígitos (8 a 15). Ej: 13055551234.')
+  if (email && (!texto(email, 100) || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email))) return falla('El email no es válido.')
+  if (instagram && !/^[\w.]{1,30}$/.test(instagram)) return falla('El usuario de Instagram no es válido (letras, números, punto o guion bajo).')
+  if (tiktok && !/^[\w.]{1,30}$/.test(tiktok)) return falla('El usuario de TikTok no es válido (letras, números, punto o guion bajo).')
+  if (youtube && (!texto(youtube, 200) || !/^https:\/\/(www\.|m\.)?youtube\.com\/\S+$/.test(youtube))) return falla('El link de YouTube tiene que empezar con https://youtube.com/ o https://www.youtube.com/.')
+
+  const mensajes = {}
+  for (const sitio of ['portafolio', 'eventos', 'comercial']) {
+    const m = limpio(d.mensajes[sitio])
+    if (!texto(m, 300) || !m) return falla(`El mensaje de WhatsApp de ${sitio} es obligatorio (máx. 300 caracteres).`)
+    mensajes[sitio] = m
+  }
+  return { ok: true, datos: { whatsapp, email, instagram, tiktok, youtube, mensajes } }
+}
+
 export const VALIDADORES = {
   videos,
   'precios-eventos': preciosEventos,
-  'precios-comercial': preciosComercial
+  'precios-comercial': preciosComercial,
+  contacto
 }

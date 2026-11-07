@@ -114,6 +114,28 @@ test('valida precios de eventos y de comercial', async () => {
   assert.deepEqual(JSON.parse(readFileSync(join(tmp, 'precios-comercial.json'), 'utf8')).paquetes[0].incluye, ['1 hora de grabación'])
 })
 
+test('contacto: guarda datos válidos (limpia @ y espacios) y rechaza inválidos', async () => {
+  const base = await (await pedir('/api/datos/contacto')).json()
+  const bueno = { ...base, whatsapp: '+1 (305) 555-1234', email: 'angel@ejemplo.com', instagram: '@anmar.prod', youtube: 'https://www.youtube.com/@anmar' }
+  assert.equal((await pedir('/api/datos/contacto', { metodo: 'PUT', cuerpo: bueno })).status, 200)
+  const g = JSON.parse(readFileSync(join(tmp, 'contacto.json'), 'utf8'))
+  assert.equal(g.whatsapp, '13055551234')
+  assert.equal(g.instagram, 'anmar.prod')
+
+  for (const [campo, valor, texto] of [
+    ['whatsapp', '305-ABC', /WhatsApp/],
+    ['email', 'no-es-email', /email/],
+    ['youtube', 'https://malo.com/canal', /YouTube/],
+    ['instagram', 'con espacio', /Instagram/]
+  ]) {
+    const r = await pedir('/api/datos/contacto', { metodo: 'PUT', cuerpo: { ...bueno, [campo]: valor } })
+    assert.equal(r.status, 400, campo)
+    assert.match((await r.json()).error, texto)
+  }
+  const sinMensaje = await pedir('/api/datos/contacto', { metodo: 'PUT', cuerpo: { ...bueno, mensajes: { ...bueno.mensajes, eventos: ' ' } } })
+  assert.equal(sinMensaje.status, 400)
+})
+
 test('cerrar sesión invalida la cookie', async () => {
   assert.equal((await pedir('/api/logout', { metodo: 'POST' })).status, 200)
   assert.equal((await pedir('/api/sesion')).status, 401)

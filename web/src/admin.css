@@ -108,3 +108,16 @@ input[type='number']:focus, textarea:focus { outline: none; border-color: var(--
 
 /* ---------- Turnstile ---------- */
 .turnstile { min-height: 65px; margin: 14px 0 6px; }
+
+/* ---------- Contacto ---------- */
+.contacto { display: grid; gap: 6px; }
+.contacto h2 { margin-bottom: 6px; }
+.contacto label { margin: 10px 0 0; }
+.contacto label:first-of-type { margin-top: 0; }
+.contacto small { color: var(--texto-suave); font-size: 0.8rem; }
+.contacto .boton { margin-top: 14px; text-decoration: none; }
+input[type="tel"], input[type="email"] {
+  width: 100%; min-height: 48px; padding: 0 14px; border-radius: 12px;
+  border: 1px solid var(--borde); background: var(--fondo); color: var(--texto); font: inherit; font-size: 16px;
+}
+input[type="tel"]:focus, input[type="email"]:focus { outline: none; border-color: var(--acento); }

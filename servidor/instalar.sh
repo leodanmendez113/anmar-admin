@@ -78,7 +78,7 @@ install -d -m 0700 -o root -g root /etc/anmar
 chown -R deploy:deploy $RAIZ/repos
 
 paso "Datos iniciales (solo si todavía no existen)"
-for f in videos precios-eventos precios-comercial; do
+for f in videos precios-eventos precios-comercial contacto; do
   if [ ! -f $RAIZ/datos/$f.json ]; then
     install -m 0644 -o anmar -g anmar "$AQUI/datos-iniciales/$f.json" $RAIZ/datos/$f.json
   fi

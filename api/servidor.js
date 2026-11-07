@@ -13,7 +13,7 @@ import { verificarTurnstile } from './turnstile.js'
 //   POST /api/login            { usuario, clave, turnstile }
 //   POST /api/logout
 //   GET  /api/sesion
-//   GET  /api/datos/:nombre    nombre = videos | precios-eventos | precios-comercial
+//   GET  /api/datos/:nombre    nombre = videos | precios-eventos | precios-comercial | contacto
 //   PUT  /api/datos/:nombre
 
 const LIMITE_CUERPO = 200 * 1024

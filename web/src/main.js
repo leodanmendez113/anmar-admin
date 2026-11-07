@@ -4,6 +4,7 @@ import { api } from './api.js'
 import { crearVideos } from './videos.js'
 import { crearEventos } from './eventos.js'
 import { crearComercial } from './comercial.js'
+import { crearContacto } from './contacto.js'
 import { TURNSTILE_SITE_KEY } from './config.js'
 
 const $ = (sel) => document.querySelector(sel)
@@ -42,7 +43,8 @@ function reiniciarTurnstile() {
 const SECCIONES = {
   videos: { titulo: 'Videos', archivo: 'videos', crear: crearVideos },
   eventos: { titulo: 'Precios eventos', archivo: 'precios-eventos', crear: crearEventos },
-  comercial: { titulo: 'Precios comercial', archivo: 'precios-comercial', crear: crearComercial }
+  comercial: { titulo: 'Precios comercial', archivo: 'precios-comercial', crear: crearComercial },
+  contacto: { titulo: 'Contacto', archivo: 'contacto', crear: crearContacto }
 }
 
 let actual = null // { clave, editor, original }
