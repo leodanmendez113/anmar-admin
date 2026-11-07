@@ -3,13 +3,14 @@ import { CONFIG } from './config.js'
 import { VALIDADORES } from './validar.js'
 import { leer, guardar } from './archivos.js'
 import {
-  bloqueada, iniciarSesion, sesionValida, cerrarSesion, cookieSesion, tokenDeCookie
+  bloqueada, anotarFallo, iniciarSesion, sesionValida, cerrarSesion, cookieSesion, tokenDeCookie
 } from './sesiones.js'
+import { verificarTurnstile } from './turnstile.js'
 
 // API del admin. Solo escucha en 127.0.0.1: desde afuera se llega únicamente a través de Caddy
 // (https://admin.anmarproductions.com/api/...).
 //
-//   POST /api/login            { usuario, clave }
+//   POST /api/login            { usuario, clave, turnstile }
 //   POST /api/logout
 //   GET  /api/sesion
 //   GET  /api/datos/:nombre    nombre = videos | precios-eventos | precios-comercial
@@ -56,7 +57,13 @@ export function crearServidor() {
       if (url.pathname === '/api/login' && metodo === 'POST') {
         const ip = ipDe(req)
         if (bloqueada(ip)) return responder(res, 429, { error: 'Demasiados intentos. Espera 15 minutos.' })
-        const { usuario, clave } = await leerCuerpo(req)
+        const { usuario, clave, turnstile } = await leerCuerpo(req)
+        // Primero Cloudflare confirma que es una persona; recién después se revisa la contraseña.
+        const humano = await verificarTurnstile(String(turnstile ?? ''), ip)
+        if (!humano.ok) {
+          if (humano.contarFallo) anotarFallo(ip)
+          return responder(res, humano.estado, { error: humano.error })
+        }
         const token = iniciarSesion(ip, String(usuario ?? ''), String(clave ?? ''))
         if (!token) return responder(res, 401, { error: 'Usuario o contraseña incorrectos.' })
         return responder(res, 200, { ok: true }, { 'Set-Cookie': cookieSesion(token) })

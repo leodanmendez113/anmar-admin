@@ -4,8 +4,40 @@ import { api } from './api.js'
 import { crearVideos } from './videos.js'
 import { crearEventos } from './eventos.js'
 import { crearComercial } from './comercial.js'
+import { TURNSTILE_SITE_KEY } from './config.js'
 
 const $ = (sel) => document.querySelector(sel)
+
+// ---------- Cloudflare Turnstile ----------
+// Cada token sirve para un solo intento: después de un login fallido se pide uno nuevo.
+let turnstileId = null
+let turnstileToken = ''
+
+function montarTurnstile(intentos = 0) {
+  if (turnstileId !== null) return
+  if (!window.turnstile) {
+    if (intentos > 50) {
+      $('[data-error-login]').textContent = 'No cargó la verificación de seguridad. Revisa tu conexión o desactiva el bloqueador de anuncios.'
+      return
+    }
+    setTimeout(() => montarTurnstile(intentos + 1), 200)
+    return
+  }
+  turnstileId = window.turnstile.render('[data-turnstile]', {
+    sitekey: TURNSTILE_SITE_KEY,
+    theme: 'dark',
+    language: 'es',
+    size: 'flexible',
+    callback: (token) => { turnstileToken = token },
+    'expired-callback': () => { turnstileToken = '' },
+    'error-callback': () => { turnstileToken = '' }
+  })
+}
+
+function reiniciarTurnstile() {
+  turnstileToken = ''
+  if (turnstileId !== null) window.turnstile?.reset(turnstileId)
+}
 
 const SECCIONES = {
   videos: { titulo: 'Videos', archivo: 'videos', crear: crearVideos },
@@ -19,6 +51,7 @@ function mostrar(pantalla) {
   $('[data-cargando]').hidden = pantalla !== 'cargando'
   $('[data-acceso]').hidden = pantalla !== 'acceso'
   $('[data-app]').hidden = pantalla !== 'app'
+  if (pantalla === 'acceso') montarTurnstile()
 }
 
 const hayCambios = () => actual && JSON.stringify(actual.editor.datos()) !== actual.original
@@ -79,13 +112,18 @@ document.querySelectorAll('[data-pestana]').forEach((b) => b.addEventListener('c
 $('[data-form-login]').addEventListener('submit', async (e) => {
   e.preventDefault()
   const error = $('[data-error-login]')
+  if (!turnstileToken) {
+    error.textContent = 'Espera a que termine la verificación de seguridad (el recuadro de arriba).'
+    return
+  }
   error.textContent = ''
   try {
-    await api.entrar($('#usuario').value.trim(), $('#clave').value)
+    await api.entrar($('#usuario').value.trim(), $('#clave').value, turnstileToken)
     $('#clave').value = ''
     entrarApp()
   } catch (err) {
     error.textContent = err.message
+    reiniciarTurnstile()
   }
 })
 

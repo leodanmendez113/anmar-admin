@@ -39,7 +39,7 @@ export function bloqueada(ip) {
   return f.cantidad >= INTENTOS_MAX
 }
 
-function anotarFallo(ip) {
+export function anotarFallo(ip) {
   const f = fallos.get(ip)
   if (!f || Date.now() - f.desde > VENTANA_MS) fallos.set(ip, { cantidad: 1, desde: Date.now() })
   else f.cantidad++

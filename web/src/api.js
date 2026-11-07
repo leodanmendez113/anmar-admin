@@ -16,7 +16,7 @@ async function pedir(ruta, opciones = {}) {
 
 export const api = {
   sesion: () => pedir('/sesion'),
-  entrar: (usuario, clave) => pedir('/login', { method: 'POST', body: JSON.stringify({ usuario, clave }) }),
+  entrar: (usuario, clave, turnstile) => pedir('/login', { method: 'POST', body: JSON.stringify({ usuario, clave, turnstile }) }),
   salir: () => pedir('/logout', { method: 'POST' }),
   leer: (nombre) => pedir(`/datos/${nombre}`),
   guardar: (nombre, datos) => pedir(`/datos/${nombre}`, { method: 'PUT', body: JSON.stringify(datos) })

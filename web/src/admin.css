@@ -105,3 +105,6 @@ input[type='number']:focus, textarea:focus { outline: none; border-color: var(--
 .paquetes-ed .fila-campos input[type='text'] { flex: 1; min-width: 0; }
 .switch.grande { font-size: 1rem; font-weight: 600; }
 .boton.secundario { width: 100%; background: transparent; color: var(--acento); border: 1px dashed var(--acento); }
+
+/* ---------- Turnstile ---------- */
+.turnstile { min-height: 65px; margin: 14px 0 6px; }

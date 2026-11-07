@@ -10,5 +10,11 @@ export const CONFIG = {
   // En producción la cookie solo viaja por HTTPS.
   cookieSegura: process.env.NODE_ENV === 'production',
   versionesGuardadas: 30,
-  horasSesion: 12
+  horasSesion: 12,
+  // Cloudflare Turnstile (anti-bots en el login). La clave secreta vive solo en el VPS
+  // (/etc/anmar/api.env). Sin clave: en desarrollo se omite; en producción se rechaza el login.
+  turnstileSecreto: process.env.TURNSTILE_SECRET || '',
+  turnstileUrl: process.env.TURNSTILE_URL || 'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+  // Si se define, el token tiene que haberse generado en ese dominio.
+  turnstileHost: process.env.TURNSTILE_HOST || ''
 }
