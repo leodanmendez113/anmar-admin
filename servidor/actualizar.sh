@@ -54,7 +54,8 @@ for repo in "${!SITIOS[@]}"; do
   rsync -a --delete "$web/dist/" "$RAIZ/sitios/$sitio/"
 
   if [ "$repo" = "anmar-admin" ]; then
-    rsync -a --delete --exclude '*.test.js' --exclude '.credenciales-dev.json' "$dir/api/" "$RAIZ/api/"
+    # El código de la API queda a nombre de root: ni el usuario que compila ni la API pueden cambiarlo.
+    rsync -a --delete --chown=root:root --exclude '*.test.js' --exclude '.credenciales-dev.json' "$dir/api/" "$RAIZ/api/"
     systemctl restart anmar-api
   fi
 

@@ -83,12 +83,7 @@ done
 
 paso "Comandos, servicios y Caddy"
 install -m 0755 "$AQUI/actualizar.sh" /usr/local/sbin/anmar-actualizar
-cat > /usr/local/bin/anmar-clave <<'EOF'
-#!/usr/bin/env bash
-# Crea o cambia el usuario y la contraseña del admin (https://admin.anmarproductions.com).
-exec runuser -u anmar -- env CREDENCIALES=/srv/anmar/config/credenciales.json node /srv/anmar/api/clave.js
-EOF
-chmod 0755 /usr/local/bin/anmar-clave
+install -m 0755 "$AQUI/anmar-clave.sh" /usr/local/bin/anmar-clave
 install -m 0644 "$AQUI/systemd/anmar-api.service"        /etc/systemd/system/
 install -m 0644 "$AQUI/systemd/anmar-actualizar.service" /etc/systemd/system/
 install -m 0644 "$AQUI/systemd/anmar-actualizar.timer"   /etc/systemd/system/
@@ -103,4 +98,4 @@ systemctl reload caddy || systemctl restart caddy
 
 paso "Listo"
 echo "Webs:  https://portafolio. / eventos. / comercial. / admin.anmarproductions.com"
-[ -f $RAIZ/config/credenciales.json ] || echo "FALTA: corre 'anmar-clave' para crear el usuario y la contraseña del admin."
+[ -f $RAIZ/config/credenciales.json ] || echo "FALTA: corre 'anmar-clave' (solo, en su propia línea) para crear el usuario y la contraseña del admin."
